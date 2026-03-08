@@ -1,0 +1,11 @@
+{
+  "name": "ACME.sh SSL 证书管理器",
+  "content_in_root": false,
+  "domains": ["acme_sh"],
+  "country": ["CN"],
+  "homeassistant": "2024.1.0",
+  "hacs": "1.34.0",
+  "iot_class": "local_polling",
+  "render_readme": true,
+  "version": "1.0.0"
+}

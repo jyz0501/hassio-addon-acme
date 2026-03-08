@@ -1,6 +1,6 @@
-# ACME.sh SSL Home Assistant Add-on
+# ACME.sh SSL Certificate Manager for Home Assistant
 
-这是一个基于 [acme.sh](https://github.com/acmesh-official/acme.sh) 的 Home Assistant Add-on，用于自动申请和管理 SSL 证书。
+这是一个 Home Assistant 自定义集成（custom_components），基于 [acme.sh](https://github.com/acmesh-official/acme.sh) 实现自动申请和管理 SSL 证书。
 
 ## 功能特性
 
@@ -10,9 +10,47 @@
 - 📁 自动将证书安装到 Home Assistant SSL 目录
 - 🛠️ 支持 RSA 和 ECC 证书
 - 🧪 支持 Staging 环境测试
-- 🐛 调试模式支持
+- 🎨 UI 配置界面（Config Flow）
+- � 事件通知
 
-## 支持的 DNS 提供商
+## 安装方法
+
+### 方法一：通过 HACS 安装（推荐）
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jyz0501&repository=hassio-addon-acme&category=integration)
+
+1. 打开 HACS（Home Assistant Community Store）
+2. 点击 **集成** → 右上角 **⋮** → **自定义仓库**
+3. 添加仓库地址：`https://github.com/jyz0501/hassio-addon-acme`
+4. 类别选择 **集成**
+5. 点击 **添加**
+6. 在 HACS 中找到 "ACME.sh SSL Certificate Manager" 并点击 **下载**
+7. 重启 Home Assistant
+
+### 方法二：手动安装
+
+1. 下载此仓库
+2. 将 `custom_components/acme_sh` 文件夹复制到您的 Home Assistant `custom_components` 目录
+3. 重启 Home Assistant
+
+## 配置
+
+### 添加集成
+
+1. 进入 **设置** → **设备与服务**
+2. 点击右下角 **添加集成** 按钮
+3. 搜索 "ACME.sh"
+4. 按照配置向导填写信息：
+   - **邮箱**：用于 ACME 账户注册
+   - **域名**：逗号分隔的域名列表（支持通配符）
+   - **DNS 提供商**：选择您的 DNS 服务商
+   - **DNS 环境变量**：API 凭证（格式：`KEY1=value1;KEY2=value2`）
+   - **密钥长度**：选择证书密钥类型
+   - **续期天数**：到期前多少天续期
+   - **测试模式**：是否使用 Staging 环境
+   - **ACME 服务器**：选择证书颁发机构
+
+### DNS 提供商配置示例
 
 | DNS 提供商 | 代码 | 环境变量示例 |
 |-----------|------|-------------|
@@ -21,127 +59,62 @@
 | DNSPod | dns_dp | `DP_Id=xxx;DP_Key=xxx` |
 | GoDaddy | dns_gd | `GD_Key=xxx;GD_Secret=xxx` |
 | AWS Route53 | dns_aws | `AWS_ACCESS_KEY_ID=xxx;AWS_SECRET_ACCESS_KEY=xxx` |
-| Linode | dns_linode | `LINODE_API_KEY=xxx` |
-| OVH | dns_ovh | `OVH_APPLICATION_KEY=xxx;OVH_APPLICATION_SECRET=xxx;OVH_CONSUMER_KEY=xxx` |
-| DigitalOcean | dns_do | `DO_API_KEY=xxx` |
-| Hetzner | dns_hetzner | `HETZNER_API_KEY=xxx` |
-| Gandi | dns_gandi | `GANDI_API_KEY=xxx` |
-| Namecheap | dns_namecheap | `NAMECHEAP_API_KEY=xxx;NAMECHEAP_API_USER=xxx` |
-| Namesilo | dns_namesilo | `Namesilo_Key=xxx` |
-| Porkbun | dns_porkbun | `PORKBUN_API_KEY=xxx;PORKBUN_SECRET_API_KEY=xxx` |
-| Vultr | dns_vultr | `VULTR_API_KEY=xxx` |
 
 更多 DNS 提供商请参考 [acme.sh DNS API 文档](https://github.com/acmesh-official/acme.sh/wiki/dnsapi)
 
-## 安装方法
+## 服务
 
-### 添加自定义加载项仓库
+安装集成后，您可以使用以下服务：
 
-1. 在 Home Assistant 侧边栏，点击 **设置** → **加载项**
-2. 点击右下角 **加载项商店** 按钮
-3. 点击右上角 **⋮** 菜单，选择 **仓库**
-4. 点击 **添加**，输入仓库地址：`https://github.com/jyz0501/hassio-addon-acme`
-5. 点击 **添加**
-6. 刷新页面后，在加载项商店底部找到 "ACME.sh SSL"
-7. 点击进入，然后点击 **安装**
+### acme_sh.issue_certificate
 
-## 配置示例
-
-### Cloudflare 配置示例
+申请或续期 SSL 证书。
 
 ```yaml
-email: your-email@example.com
-domains:
-  - "*.example.com"
-  - "example.com"
-dns_provider: dns_cf
-dns_env: "CF_Token=your-cloudflare-api-token;CF_Zone_ID=your-zone-id"
-keylength: "ec-256"
-staging: false
-auto_renew: true
-renew_interval: "0 2 * * *"
-acme_server: "letsencrypt"
+service: acme_sh.issue_certificate
+data:
+  email: your-email@example.com
+  domains:
+    - "*.example.com"
+    - "example.com"
+  dns_provider: dns_cf
+  dns_env:
+    CF_Token: "your-token"
+  keylength: "ec-256"
+  staging: false
+  acme_server: "letsencrypt"
+  force: false
 ```
 
-### 阿里云配置示例
+### acme_sh.renew_certificate
+
+检查并续期证书。
 
 ```yaml
-email: your-email@example.com
-domains:
-  - "*.example.com"
-  - "example.com"
-dns_provider: dns_ali
-dns_env: "Ali_Key=your-aliyun-access-key;Ali_Secret=your-aliyun-access-secret"
-keylength: "ec-256"
-auto_renew: true
-acme_server: "letsencrypt"
+service: acme_sh.renew_certificate
 ```
 
-### DNSPod 配置示例
+## 事件
+
+集成会触发以下事件：
+
+- `acme_sh_certificate_issued` - 证书申请成功
+- `acme_sh_certificate_failed` - 证书申请失败
+- `acme_sh_renewal_completed` - 证书续期完成
+
+### 自动化示例
 
 ```yaml
-email: your-email@example.com
-domains:
-  - "*.example.com"
-  - "example.com"
-dns_provider: dns_dp
-dns_env: "DP_Id=your-dnspod-id;DP_Key=your-dnspod-token"
-keylength: "ec-256"
-auto_renew: true
-acme_server: "letsencrypt"
+automation:
+  - alias: "SSL Certificate Renewed"
+    trigger:
+      - platform: event
+        event_type: acme_sh_certificate_issued
+    action:
+      - service: notify.notify
+        data:
+          message: "SSL certificate has been renewed successfully!"
 ```
-
-### 高级配置示例
-
-```yaml
-email: your-email@example.com
-domains:
-  - "*.example.com"
-  - "example.com"
-dns_provider: dns_cf
-dns_env: "CF_Token=your-token"
-keylength: "ec-256"
-days: 60                    # 到期前60天续期
-staging: false
-force_issue: false          # 强制重新申请
-auto_renew: true
-renew_interval: "0 2 * * *"
-reload_cmd: ""              # 证书重载命令
-deploy_hook: ""             # 部署钩子
-acme_server: "letsencrypt"
-debug: false                # 调试模式
-```
-
-## 配置选项说明
-
-| 选项 | 必需 | 默认值 | 说明 |
-|-----|------|-------|------|
-| `email` | ✅ | - | 用于注册 ACME 账户的邮箱 |
-| `domains` | ✅ | - | 要申请证书的域名列表 |
-| `dns_provider` | ✅ | `dns_cf` | DNS API 提供商代码 |
-| `dns_env` | ✅ | - | DNS 提供商的环境变量（格式: `KEY1=value1;KEY2=value2`） |
-| `keylength` | ❌ | `ec-256` | 密钥长度：`2048`、`3072`、`4096`、`ec-256`、`ec-384` |
-| `days` | ❌ | `60` | 到期前多少天开始续期 |
-| `staging` | ❌ | `false` | 是否使用 Staging 环境（测试用） |
-| `force_issue` | ❌ | `false` | 强制重新申请证书 |
-| `auto_renew` | ❌ | `true` | 是否启用自动续期 |
-| `renew_interval` | ❌ | `0 2 * * *` | 续期检查间隔（cron 表达式） |
-| `reload_cmd` | ❌ | - | 证书更新后的重载命令 |
-| `deploy_hook` | ❌ | - | 证书部署后的钩子脚本 |
-| `acme_server` | ❌ | `letsencrypt` | ACME 服务器 |
-| `debug` | ❌ | `false` | 调试模式 |
-
-## 证书位置
-
-申请成功后，证书将保存在以下位置：
-
-- `/ssl/acme.sh/<domain>/` - 证书完整目录
-  - `cert.pem` - 证书
-  - `key.pem` - 私钥
-  - `fullchain.pem` - 完整证书链
-  - `ca.pem` - CA 证书
-- `/ssl/<domain>.pem` - 完整证书链（供 Home Assistant 使用）
-- `/ssl/<domain>-key.pem` - 私钥（供 Home Assistant 使用）
 
 ## Home Assistant 配置
 
@@ -149,23 +122,37 @@ debug: false                # 调试模式
 
 ```yaml
 http:
-  ssl_certificate: /ssl/example.com.pem
+  ssl_certificate: /ssl/example.com-fullchain.pem
   ssl_key: /ssl/example.com-key.pem
+```
+
+## 证书位置
+
+申请成功后，证书将保存在：
+
+- `/ssl/<domain>.pem` - 证书
+- `/ssl/<domain>-key.pem` - 私钥
+- `/ssl/<domain>-fullchain.pem` - 完整证书链
+
+## 前置要求
+
+此集成需要 acme.sh 已安装在您的 Home Assistant 系统中。您可以通过以下方式安装：
+
+### 方式一：使用 Add-on（推荐）
+
+安装本仓库提供的 ACME.sh Add-on。
+
+### 方式二：手动安装
+
+```bash
+curl https://get.acme.sh | sh -s email=my@example.com
 ```
 
 ## 故障排除
 
 ### 查看日志
 
-在 Add-on 页面点击 **日志** 查看运行日志。
-
-### 调试模式
-
-启用调试模式获取详细信息：
-
-```yaml
-debug: true
-```
+在 **设置** → **系统** → **日志** 中查看相关日志。
 
 ### 常见问题
 
@@ -173,28 +160,29 @@ debug: true
    - 检查 DNS 提供商的 API 密钥是否正确
    - 确认域名 DNS 解析正常
    - 检查邮箱格式是否正确
-   - 启用 `debug: true` 查看详细日志
 
-2. **证书未自动续期**
-   - 检查 `auto_renew` 是否设置为 `true`
-   - 查看日志中的续期任务是否正常运行
+2. **找不到 acme.sh**
+   - 确保已安装 acme.sh
+   - 检查 acme.sh 是否在 PATH 中
 
-3. **Staging 模式**
-   - 测试时建议开启 `staging: true`
-   - 正式使用时请设置为 `false`
+3. **权限问题**
+   - 确保 Home Assistant 有权限访问 SSL 目录
 
-4. **强制重新申请**
-   - 设置 `force_issue: true` 可以强制重新申请证书
+## 支持的 ACME 服务器
 
-## 更新日志
-
-### 1.0.0
-- 初始版本发布
-- 支持多种 DNS 提供商
-- 支持自动续期
-- 支持多种 ACME 服务器
-- 支持调试模式
+| 服务器 | 代码 | 说明 |
+|-------|------|------|
+| Let's Encrypt | letsencrypt | 默认，免费 |
+| Let's Encrypt (Staging) | letsencrypt_test | 测试用 |
+| ZeroSSL | zerossl | 免费 |
+| Google Trust Services | google | 免费 |
+| Buypass | buypass | 免费 |
+| SSL.com | sslcom | 商业 |
 
 ## 许可证
 
 MIT License
+
+## 致谢
+
+- [acme.sh](https://github.com/acmesh-official/acme.sh) - 强大的 ACME 协议客户端

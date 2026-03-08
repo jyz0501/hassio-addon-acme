@@ -1,0 +1,13 @@
+{
+  "domain": "acme_sh",
+  "name": "ACME.sh SSL Certificate Manager",
+  "codeowners": ["@jyz0501"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jyz0501/hassio-addon-acme",
+  "integration_type": "service",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/jyz0501/hassio-addon-acme/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

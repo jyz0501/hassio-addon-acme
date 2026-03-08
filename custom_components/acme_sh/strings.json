@@ -1,0 +1,87 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ACME.sh SSL Certificate Manager",
+        "description": "Configure your SSL certificate settings",
+        "data": {
+          "email": "Email address for ACME account",
+          "domains": "Domains (comma-separated, e.g., example.com,*.example.com)",
+          "dns_provider": "DNS Provider",
+          "dns_env": "DNS Environment Variables (format: KEY1=value1;KEY2=value2)",
+          "keylength": "Key Length",
+          "days": "Days before expiration to renew",
+          "staging": "Use staging environment (for testing)",
+          "acme_server": "ACME Server"
+        },
+        "data_description": {
+          "email": "Your email address for Let's Encrypt or other ACME provider",
+          "domains": "Enter domains separated by commas. Use *.domain.com for wildcards",
+          "dns_env": "Environment variables for your DNS provider API"
+        }
+      }
+    },
+    "error": {
+      "unknown": "Unexpected error occurred"
+    },
+    "abort": {
+      "already_configured": "This domain is already configured"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ACME.sh Options",
+        "description": "Configure automatic renewal settings",
+        "data": {
+          "auto_renew": "Enable automatic renewal",
+          "renew_interval": "Renewal check interval (cron format)"
+        }
+      }
+    }
+  },
+  "services": {
+    "issue_certificate": {
+      "name": "Issue Certificate",
+      "description": "Issue or renew an SSL certificate",
+      "fields": {
+        "email": {
+          "name": "Email",
+          "description": "Email address for ACME account"
+        },
+        "domains": {
+          "name": "Domains",
+          "description": "List of domains for the certificate"
+        },
+        "dns_provider": {
+          "name": "DNS Provider",
+          "description": "DNS API provider code"
+        },
+        "dns_env": {
+          "name": "DNS Environment",
+          "description": "Environment variables for DNS provider"
+        },
+        "keylength": {
+          "name": "Key Length",
+          "description": "Certificate key length"
+        },
+        "staging": {
+          "name": "Staging",
+          "description": "Use staging environment"
+        },
+        "acme_server": {
+          "name": "ACME Server",
+          "description": "ACME server to use"
+        },
+        "force": {
+          "name": "Force",
+          "description": "Force reissue even if not expired"
+        }
+      }
+    },
+    "renew_certificate": {
+      "name": "Renew Certificate",
+      "description": "Check and renew certificates if needed"
+    }
+  }
+}

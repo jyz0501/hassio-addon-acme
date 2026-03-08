@@ -1,0 +1,87 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "ACME.sh SSL 证书管理器",
+        "description": "配置您的 SSL 证书设置",
+        "data": {
+          "email": "ACME 账户邮箱地址",
+          "domains": "域名（逗号分隔，如：example.com,*.example.com）",
+          "dns_provider": "DNS 提供商",
+          "dns_env": "DNS 环境变量（格式：KEY1=value1;KEY2=value2）",
+          "keylength": "密钥长度",
+          "days": "到期前多少天续期",
+          "staging": "使用测试环境（用于测试）",
+          "acme_server": "ACME 服务器"
+        },
+        "data_description": {
+          "email": "用于 Let's Encrypt 或其他 ACME 提供商的邮箱地址",
+          "domains": "输入逗号分隔的域名。使用 *.domain.com 表示通配符",
+          "dns_env": "DNS 提供商 API 的环境变量"
+        }
+      }
+    },
+    "error": {
+      "unknown": "发生未知错误"
+    },
+    "abort": {
+      "already_configured": "此域名已配置"
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "ACME.sh 选项",
+        "description": "配置自动续期设置",
+        "data": {
+          "auto_renew": "启用自动续期",
+          "renew_interval": "续期检查间隔（cron 格式）"
+        }
+      }
+    }
+  },
+  "services": {
+    "issue_certificate": {
+      "name": "申请证书",
+      "description": "申请或续期 SSL 证书",
+      "fields": {
+        "email": {
+          "name": "邮箱",
+          "description": "ACME 账户邮箱地址"
+        },
+        "domains": {
+          "name": "域名",
+          "description": "证书域名列表"
+        },
+        "dns_provider": {
+          "name": "DNS 提供商",
+          "description": "DNS API 提供商代码"
+        },
+        "dns_env": {
+          "name": "DNS 环境变量",
+          "description": "DNS 提供商的环境变量"
+        },
+        "keylength": {
+          "name": "密钥长度",
+          "description": "证书密钥长度"
+        },
+        "staging": {
+          "name": "测试模式",
+          "description": "使用测试环境"
+        },
+        "acme_server": {
+          "name": "ACME 服务器",
+          "description": "使用的 ACME 服务器"
+        },
+        "force": {
+          "name": "强制",
+          "description": "即使未到期也强制重新申请"
+        }
+      }
+    },
+    "renew_certificate": {
+      "name": "续期证书",
+      "description": "检查并在需要时续期证书"
+    }
+  }
+}
