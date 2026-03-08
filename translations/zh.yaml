@@ -1,0 +1,43 @@
+configuration:
+  email:
+    name: 邮箱地址
+    description: 用于注册 ACME 账户的邮箱地址
+  domains:
+    name: 域名列表
+    description: 要申请 SSL 证书的域名列表（支持通配符）
+  dns_provider:
+    name: DNS 提供商
+    description: DNS API 提供商代码（如 dns_cf 表示 Cloudflare，dns_ali 表示阿里云）
+  dns_env:
+    name: DNS 环境变量
+    description: DNS 提供商的环境变量，格式为 KEY1=value1;KEY2=value2（根据所选提供商填写对应变量）
+  keylength:
+    name: 密钥长度
+    description: 证书密钥长度或椭圆曲线（推荐 ec-256）
+  days:
+    name: 续期天数
+    description: 证书在到期前多少天开始续期（默认60天）
+  staging:
+    name: 测试模式
+    description: 使用 Staging 环境进行测试（不会颁发真实证书）
+  force_issue:
+    name: 强制申请
+    description: 强制重新申请证书（即使未到期）
+  auto_renew:
+    name: 自动续期
+    description: 启用自动证书续期功能
+  renew_interval:
+    name: 续期间隔
+    description: 续期检查的 Cron 表达式（默认每天凌晨2点）
+  reload_cmd:
+    name: 重载命令
+    description: 证书更新后执行的重载命令（如重启服务）
+  deploy_hook:
+    name: 部署钩子
+    description: 证书部署后要执行的自定义命令
+  acme_server:
+    name: ACME 服务器
+    description: 用于颁发证书的 ACME 服务器
+  debug:
+    name: 调试模式
+    description: 启用调试输出（用于排查问题）

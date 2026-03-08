@@ -1,0 +1,51 @@
+{
+  "name": "ACME.sh SSL",
+  "version": "1.0.0",
+  "slug": "acme_sh",
+  "description": "使用 acme.sh 自动申请和管理 SSL 证书",
+  "url": "https://github.com/acmesh-official/acme.sh",
+  "arch": ["aarch64", "amd64", "armhf", "armv7", "i386"],
+  "startup": "services",
+  "boot": "auto",
+  "init": false,
+  "hassio_api": true,
+  "hassio_role": "default",
+  "homeassistant_api": false,
+  "host_network": false,
+  "map": [
+    "ssl:rw",
+    "config:rw"
+  ],
+  "options": {
+    "email": null,
+    "domains": [],
+    "dns_provider": "dns_cf",
+    "dns_env": {},
+    "keylength": "ec-256",
+    "days": 60,
+    "staging": false,
+    "force_issue": false,
+    "auto_renew": true,
+    "renew_interval": "0 2 * * *",
+    "reload_cmd": "",
+    "deploy_hook": "",
+    "acme_server": "letsencrypt",
+    "debug": false
+  },
+  "schema": {
+    "email": "email",
+    "domains": ["str"],
+    "dns_provider": "str",
+    "dns_env": "str",
+    "keylength": "list(2048|3072|4096|ec-256|ec-384)",
+    "days": "int(1,180)?",
+    "staging": "bool",
+    "force_issue": "bool",
+    "auto_renew": "bool",
+    "renew_interval": "str",
+    "reload_cmd": "str?",
+    "deploy_hook": "str?",
+    "acme_server": "list(letsencrypt|letsencrypt_test|buypass|buypass_test|zerossl|sslcom|google|googletest)",
+    "debug": "bool"
+  }
+}

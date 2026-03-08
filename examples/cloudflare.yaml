@@ -1,0 +1,14 @@
+# Cloudflare DNS 配置示例
+# 适用于使用 Cloudflare 托管 DNS 的域名
+
+email: your-email@example.com
+domains:
+  - "*.example.com"    # 通配符证书
+  - "example.com"      # 根域名
+dns_provider: dns_cf
+dns_env: "CF_Token=your-cloudflare-api-token;CF_Zone_ID=your-zone-id"
+keylength: "ec-256"           # 使用 ECC 证书，更小更快
+staging: false                # 生产环境
+auto_renew: true
+renew_interval: "0 2 * * *"   # 每天凌晨 2 点检查续期
+acme_server: "letsencrypt"    # 使用 Let's Encrypt

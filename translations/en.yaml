@@ -1,0 +1,43 @@
+configuration:
+  email:
+    name: Email
+    description: Email address for ACME account registration
+  domains:
+    name: Domains
+    description: List of domains to request certificates for (wildcards supported)
+  dns_provider:
+    name: DNS Provider
+    description: DNS API provider code (e.g., dns_cf for Cloudflare, dns_ali for Aliyun)
+  dns_env:
+    name: DNS Environment Variables
+    description: DNS provider environment variables in format KEY1=value1;KEY2=value2
+  keylength:
+    name: Key Length
+    description: Certificate key length or curve (ec-256 recommended)
+  days:
+    name: Renew Days
+    description: Days before expiration to start renewal (default 60)
+  staging:
+    name: Staging Mode
+    description: Use staging environment for testing
+  force_issue:
+    name: Force Issue
+    description: Force reissue certificate even if not expired
+  auto_renew:
+    name: Auto Renew
+    description: Enable automatic certificate renewal
+  renew_interval:
+    name: Renew Interval
+    description: Cron expression for renewal check interval
+  reload_cmd:
+    name: Reload Command
+    description: Command to run after certificate update
+  deploy_hook:
+    name: Deploy Hook
+    description: Command to run after certificate deployment
+  acme_server:
+    name: ACME Server
+    description: ACME server to use for certificate issuance
+  debug:
+    name: Debug Mode
+    description: Enable debug output for troubleshooting

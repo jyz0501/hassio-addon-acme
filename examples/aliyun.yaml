@@ -1,0 +1,14 @@
+# 阿里云 DNS 配置示例
+# 适用于使用阿里云 DNS 托管的域名
+
+email: your-email@example.com
+domains:
+  - "*.example.com"
+  - "example.com"
+dns_provider: dns_ali
+dns_env: "Ali_Key=your-aliyun-access-key;Ali_Secret=your-aliyun-access-secret"
+keylength: "ec-256"
+staging: false
+auto_renew: true
+renew_interval: "0 2 * * *"
+acme_server: "letsencrypt"

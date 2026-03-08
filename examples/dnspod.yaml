@@ -1,0 +1,14 @@
+# DNSPod 配置示例
+# 适用于使用 DNSPod 托管 DNS 的域名
+
+email: your-email@example.com
+domains:
+  - "*.example.com"
+  - "example.com"
+dns_provider: dns_dp
+dns_env: "DP_Id=your-dnspod-id;DP_Key=your-dnspod-token"
+keylength: "ec-256"
+staging: false
+auto_renew: true
+renew_interval: "0 2 * * *"
+acme_server: "letsencrypt"

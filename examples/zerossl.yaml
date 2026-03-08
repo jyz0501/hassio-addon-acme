@@ -1,0 +1,14 @@
+# ZeroSSL 配置示例
+# 使用 ZeroSSL 作为证书颁发机构
+
+email: your-email@example.com
+domains:
+  - "*.example.com"
+  - "example.com"
+dns_provider: dns_cf
+dns_env: "CF_Token=your-cloudflare-api-token"
+keylength: "ec-256"
+staging: false
+auto_renew: true
+renew_interval: "0 2 * * *"
+acme_server: "zerossl"        # 使用 ZeroSSL 替代 Let's Encrypt
