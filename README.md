@@ -35,22 +35,15 @@
 
 ## 安装方法
 
-### 方法一：通过 HACS 安装（推荐）
+### 添加自定义加载项仓库
 
-1. 打开 HACS（Home Assistant Community Store）
-2. 点击 **集成** → 右上角 **⋮** → **自定义仓库**
-3. 添加仓库地址：`https://github.com/jyz0501/hassio-addon-acme`
-4. 类别选择 **加载项**
+1. 在 Home Assistant 侧边栏，点击 **设置** → **加载项**
+2. 点击右下角 **加载项商店** 按钮
+3. 点击右上角 **⋮** 菜单，选择 **仓库**
+4. 点击 **添加**，输入仓库地址：`https://github.com/jyz0501/hassio-addon-acme`
 5. 点击 **添加**
-6. 在 HACS 中找到 "ACME.sh SSL Add-on" 并点击 **下载**
-7. 下载完成后，在 Home Assistant **设置** → **加载项** 中找到并安装
-
-### 方法二：手动添加仓库
-
-1. 在 Home Assistant 中，进入 **设置** → **加载项** → **加载项商店**
-2. 点击右上角菜单，选择 **仓库**
-3. 添加此仓库地址：`https://github.com/jyz0501/hassio-addon-acme`
-4. 刷新页面后，找到 "ACME.sh SSL" 并安装
+6. 刷新页面后，在加载项商店底部找到 "ACME.sh SSL"
+7. 点击进入，然后点击 **安装**
 
 ## 配置示例
 
