@@ -14,7 +14,7 @@ CONF_RENEW_INTERVAL: Final = "renew_interval"
 CONF_FORCE_ISSUE: Final = "force_issue"
 
 DEFAULT_KEYLENGTH: Final = "ec-256"
-DEFAULT_DAYS: Final = 60
+DEFAULT_DAYS: Final = 7
 DEFAULT_ACME_SERVER: Final = "letsencrypt"
 DEFAULT_DNS_PROVIDER: Final = "dns_cf"
 DEFAULT_AUTO_RENEW: Final = True

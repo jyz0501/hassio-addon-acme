@@ -1,14 +1,24 @@
 """ACME.sh SSL Certificate Manager integration for Home Assistant."""
+from __future__ import annotations
+
 import asyncio
 import logging
 import os
 import subprocess
+from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_DOMAIN
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.update_coordinator import (
+    CoordinatorEntity,
+    DataUpdateCoordinator,
+    UpdateFailed,
+)
+from homeassistant.components.sensor import SensorEntity
 
 from .const import (
     DOMAIN,
@@ -27,7 +37,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[str] = []
+PLATFORMS: list[str] = ["sensor"]
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -112,6 +122,12 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                     "domains": domains,
                     "main_domain": main_domain,
                 })
+                
+                for entry_id in hass.data[DOMAIN]:
+                    if isinstance(hass.data[DOMAIN][entry_id], dict):
+                        coordinator = hass.data[DOMAIN][entry_id].get("coordinator")
+                        if coordinator:
+                            await coordinator.async_request_refresh()
             else:
                 _LOGGER.error("Failed to issue certificate: %s", stderr.decode())
                 hass.bus.async_fire(f"{DOMAIN}_certificate_failed", {
@@ -144,6 +160,12 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
             if proc.returncode == 0:
                 _LOGGER.info("Certificate renewal check completed")
                 hass.bus.async_fire(f"{DOMAIN}_renewal_completed")
+                
+                for entry_id in hass.data[DOMAIN]:
+                    if isinstance(hass.data[DOMAIN][entry_id], dict):
+                        coordinator = hass.data[DOMAIN][entry_id].get("coordinator")
+                        if coordinator:
+                            await coordinator.async_request_refresh()
             else:
                 _LOGGER.error("Certificate renewal failed: %s", stderr.decode())
         except Exception as e:
@@ -157,7 +179,105 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up ACME.sh from a config entry."""
-    hass.data[DOMAIN][entry.entry_id] = entry.data
+    
+    async def async_update_data():
+        """Fetch data from acme.sh."""
+        acme_sh_path = Path(hass.config.path("acme.sh"))
+        domains = entry.data.get("domains", [])
+        
+        if not domains:
+            return {}
+        
+        main_domain = domains[0] if isinstance(domains, list) else domains
+        cert_data = {
+            "domain": main_domain,
+            "domains": domains,
+            "status": "unknown",
+            "expiry_date": None,
+            "days_remaining": None,
+            "issuer": None,
+            "auto_renew": entry.options.get(CONF_AUTO_RENEW, True),
+        }
+        
+        try:
+            cmd = [
+                str(acme_sh_path / "acme.sh"),
+                "--list",
+                "--config-home", str(acme_sh_path),
+            ]
+            
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await proc.communicate()
+            
+            if main_domain in stdout.decode():
+                cert_data["status"] = "valid"
+            
+            ssl_dir = Path(hass.config.path("ssl"))
+            cert_file = ssl_dir / f"{main_domain}-fullchain.pem"
+            
+            if cert_file.exists():
+                openssl_cmd = [
+                    "openssl",
+                    "x509",
+                    "-in", str(cert_file),
+                    "-noout",
+                    "-dates",
+                    "-issuer",
+                ]
+                
+                proc = await asyncio.create_subprocess_exec(
+                    *openssl_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                stdout, stderr = await proc.communicate()
+                
+                output = stdout.decode()
+                
+                for line in output.split("\n"):
+                    if line.startswith("notAfter="):
+                        date_str = line.replace("notAfter=", "").strip()
+                        try:
+                            expiry_date = datetime.strptime(date_str, "%b %d %H:%M:%S %Y %Z")
+                            cert_data["expiry_date"] = expiry_date.strftime("%Y-%m-%d %H:%M:%S")
+                            cert_data["days_remaining"] = (expiry_date - datetime.now()).days
+                        except ValueError:
+                            pass
+                    elif line.startswith("issuer="):
+                        cert_data["issuer"] = line.replace("issuer=", "").strip()
+                
+                if cert_data["days_remaining"] is not None:
+                    if cert_data["days_remaining"] < 0:
+                        cert_data["status"] = "expired"
+                    elif cert_data["days_remaining"] < entry.data.get(CONF_DAYS, DEFAULT_DAYS):
+                        cert_data["status"] = "renewal_required"
+                    else:
+                        cert_data["status"] = "valid"
+        
+        except Exception as e:
+            _LOGGER.error("Error updating certificate data: %s", e)
+            raise UpdateFailed(f"Error updating certificate data: {e}")
+        
+        return cert_data
+    
+    coordinator = DataUpdateCoordinator(
+        hass,
+        _LOGGER,
+        name=f"{DOMAIN}_{entry.entry_id}",
+        update_method=async_update_data,
+        update_interval=timedelta(hours=6),
+    )
+    
+    await coordinator.async_config_entry_first_refresh()
+    
+    hass.data[DOMAIN][entry.entry_id] = {
+        "coordinator": coordinator,
+        "config": entry.data,
+    }
     
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     
