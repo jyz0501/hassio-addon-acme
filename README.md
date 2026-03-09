@@ -11,7 +11,8 @@
 - 🛠️ 支持 RSA 和 ECC 证书
 - 🧪 支持 Staging 环境测试
 - 🎨 UI 配置界面（Config Flow）
-- � 事件通知
+- 🔔 事件通知
+- 🖼️ 支持自定义品牌图标（2026.3+）
 
 ## 安装方法
 
@@ -178,6 +179,51 @@ curl https://get.acme.sh | sh -s email=my@example.com
 | Google Trust Services | google | 免费 |
 | Buypass | buypass | 免费 |
 | SSL.com | sslcom | 商业 |
+
+## 自定义品牌图标（2026.3+）
+
+从 Home Assistant 2026.3 版本开始，本集成支持自定义品牌图标和 Logo。
+
+### 添加品牌图片
+
+在集成目录的 `brand/` 文件夹中放置图片文件：
+
+```
+custom_components/acme_sh/
+├── __init__.py
+├── manifest.json
+└── brand/
+    ├── icon.png          # 集成图标（浅色主题）
+    ├── dark_icon.png     # 集成图标（深色主题）
+    ├── logo.png          # 集成 Logo（浅色主题）
+    └── dark_logo.png     # 集成 Logo（深色主题）
+```
+
+### 支持的文件
+
+| 文件名 | 说明 | 推荐尺寸 |
+|--------|------|----------|
+| `icon.png` | 集成图标（浅色） | 512x512 px |
+| `icon@2x.png` | 集成图标（Retina） | 1024x1024 px |
+| `dark_icon.png` | 集成图标（深色） | 512x512 px |
+| `dark_icon@2x.png` | 集成图标（深色 Retina） | 1024x1024 px |
+| `logo.png` | 集成 Logo（浅色） | 512x512 px |
+| `logo@2x.png` | 集成 Logo（Retina） | 1024x1024 px |
+| `dark_logo.png` | 集成 Logo（深色） | 512x512 px |
+| `dark_logo@2x.png` | 集成 Logo（深色 Retina） | 1024x1024 px |
+
+### 要求
+
+- 图片必须为 PNG 格式
+- 图标建议使用透明背景
+- 建议同时提供浅色和深色主题变体
+- 图片应为正方形
+
+### 注意事项
+
+- 本地品牌图片会自动优先于 brands CDN 中的图片
+- 此功能需要 Home Assistant 2026.3 或更高版本
+- 对于旧版本，图片将不会显示
 
 ## 许可证
 
